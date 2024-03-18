@@ -1,0 +1,298 @@
+---
+blueprint:
+  name: AWTRIX Simple Pollen
+  description: >
+    Blueprint will show the current pollen levels on AWTRIX device. Uses different icons to depict current pollen levels.
+
+    Uses 4 separate sensors for the current pollen levels which works with the Tomorrow.io integration.
+
+    This blueprint is modified from [jeeftor](https://github.com/jeeftor/HomeAssistant/blob/master/blueprints/automation/awtrix_pollen_template.yaml)
+
+    ![](https://raw.githubusercontent.com/iamdabe/HomeAssistant/main/content/awtrix_simple_pollen_preview.gif)
+
+    It uses different icons depending on pollen levels:
+
+    ### Overall Pollen Levels:
+
+      | Icon For | None | Low | Moderate | High | Very High | 
+      | ---- | ---- | --- | -------- | ---- | --------- |
+      | Overall Pollen |![Frame 0](https://raw.githubusercontent.com/iamdabe/HomeAssistant/main/content/awtrix_simple_pollen_icon_flower_frame_0.svg "Frame 0") |![Frame 1](https://raw.githubusercontent.com/iamdabe/HomeAssistant/main/content/awtrix_simple_pollen_icon_flower_frame_1.svg "Frame 1") |![Frame 2](https://raw.githubusercontent.com/iamdabe/HomeAssistant/main/content/awtrix_simple_pollen_icon_flower_frame_2.svg "Frame 2") |![Frame 3](https://raw.githubusercontent.com/iamdabe/HomeAssistant/main/content/awtrix_simple_pollen_icon_flower_frame_3.svg "Frame 3") |![Frame 4](https://raw.githubusercontent.com/iamdabe/HomeAssistant/main/content/awtrix_simple_pollen_icon_flower_frame_4.svg "Frame 4") |
+      | Trees |![Frame 0](https://raw.githubusercontent.com/iamdabe/HomeAssistant/main/content/awtrix_simple_pollen_icon_tree_frame_0.svg "Frame 0")|![Frame 1](https://raw.githubusercontent.com/iamdabe/HomeAssistant/main/content/awtrix_simple_pollen_icon_tree_frame_1.svg "Frame 1")|![Frame 2](https://raw.githubusercontent.com/iamdabe/HomeAssistant/main/content/awtrix_simple_pollen_icon_tree_frame_2.svg "Frame 2")|![Frame 3](https://raw.githubusercontent.com/iamdabe/HomeAssistant/main/content/awtrix_simple_pollen_icon_tree_frame_3.svg "Frame 3")|![Frame 4](https://raw.githubusercontent.com/iamdabe/HomeAssistant/main/content/awtrix_simple_pollen_icon_tree_frame_4.svg "Frame 4")|
+      | Weeds |![Frame 0](https://raw.githubusercontent.com/iamdabe/HomeAssistant/main/content/awtrix_simple_pollen_icon_weed_frame_0.svg "Frame 0")|![Frame 1](https://raw.githubusercontent.com/iamdabe/HomeAssistant/main/content/awtrix_simple_pollen_icon_weed_frame_1.svg "Frame 1")|![Frame 2](https://raw.githubusercontent.com/iamdabe/HomeAssistant/main/content/awtrix_simple_pollen_icon_weed_frame_2.svg "Frame 2")|![Frame 3](https://raw.githubusercontent.com/iamdabe/HomeAssistant/main/content/awtrix_simple_pollen_icon_weed_frame_3.svg "Frame 3")|![Frame 4](https://raw.githubusercontent.com/iamdabe/HomeAssistant/main/content/awtrix_simple_pollen_icon_weed_frame_4.svg "Frame 4")|
+      | Grass |![Frame 0](https://raw.githubusercontent.com/iamdabe/HomeAssistant/main/content/awtrix_simple_pollen_icon_grass_frame_0.svg "Frame 0")|![Frame 1](https://raw.githubusercontent.com/iamdabe/HomeAssistant/main/content/awtrix_simple_pollen_icon_grass_frame_1.svg "Frame 1")|![Frame 2](https://raw.githubusercontent.com/iamdabe/HomeAssistant/main/content/awtrix_simple_pollen_icon_grass_frame_2.svg "Frame 2")|![Frame 3](https://raw.githubusercontent.com/iamdabe/HomeAssistant/main/content/awtrix_simple_pollen_icon_grass_frame_3.svg "Frame 3")|![Frame 4](https://raw.githubusercontent.com/iamdabe/HomeAssistant/main/content/awtrix_simple_pollen_icon_grass_frame_4.svg "Frame 4")|
+
+
+      As well as colour bars underneath showing the current pollen level.
+
+      ### Requirements
+      - Copy awtrix_simple_pollen.yaml blueprint to your **homeassistant/config/blueprints/automation** folder
+      - You must have 4 sensors setup which contain the overall, weed, tree & grass pollen levels. This works well with the default tomorrow io integration which available here [Tomorrow.io Integration](https://www.home-assistant.io/integrations/tomorrowio/)
+      - Browse to: Settings > Automation & Scenes > Blueprints. You will see a AWTRIX Simple Pollen blueprint. Click the blueprint and complete the fields as required. The finput defaults align to the tomorrow io integration sensors.
+
+  author: i am dabe
+  domain: automation
+  input:
+    awtrix:
+      name: AWTRIX Device
+      description: Select the Awtrix light
+      selector:
+        device:
+          integration: mqtt
+          manufacturer: Blueforcer
+          multiple: true
+
+    app_name:
+      name: Awtrix Applicaiton name
+      description: This is the app name listed in the MQTT topic - it should be unique
+      selector:
+        text:
+      default: pollen
+
+    pollen_sensor:
+      name: Pollen Sensor
+      description: >-
+        This is the overall pollen sensor, should contain values very_high, high, medium, low, very_low, none
+      default: sensor.tomorrow_io_home_weed_pollen_index
+      selector:
+        entity:
+          domain:
+            - sensor
+
+    weed_pollen_sensor:
+      name: Weed Pollen Sensor
+      description: >-
+        This is the weed pollen sensor, should contain values very_high, high, medium, low, very_low, none
+      default: sensor.tomorrow_io_home_weed_pollen_index
+      selector:
+        entity:
+          domain:
+            - sensor
+
+    tree_pollen_sensor:
+      name: Tree Pollen Sensor
+      description: >-
+        This is the tree pollen  sensor, should contain values very_high, high, medium, low, very_low, none
+      default: sensor.tomorrow_io_home_tree_pollen_index
+      selector:
+        entity:
+          domain:
+            - sensor
+
+    grass_pollen_sensor:
+      name: Grass Pollen Sensor
+      description: >-
+        This is the grass pollen  sensor, should contain values very_high, high, medium, low, very_low, none
+      default: sensor.tomorrow_io_home_grass_pollen_index
+      selector:
+        entity:
+          domain:
+            - sensor
+
+mode: restart
+variables:
+  device_ids: !input awtrix
+  app_topic: !input app_name
+  message_topics: >-
+    {%- macro get_device_topic(device_id) %}
+    {{ states((device_entities(device_id) | select('search','device_topic') | list)[0]) }}
+    {%- endmacro %}
+
+    {%- set ns = namespace(devices=[]) %}
+    {%- for device_id in device_ids %}
+      {%- set device=get_device_topic(device_id)|replace(' ','') %}
+      {% set ns.devices = ns.devices + [ device ~ '/custom/' ~ app_topic] %}
+    {%- endfor %}
+    {{ ns.devices | reject('match','unavailable') | list}}
+
+  # Generate history stuff
+  pollen_sensor: !input pollen_sensor
+  weed_pollen_sensor: !input weed_pollen_sensor
+  tree_pollen_sensor: !input tree_pollen_sensor
+  grass_pollen_sensor: !input grass_pollen_sensor
+
+  current_pollen: "{{states(pollen_sensor)}}"
+  current_weed: "{{states(weed_pollen_sensor)}}"
+  current_tree: "{{states(tree_pollen_sensor)}}"
+  current_grass: "{{states(grass_pollen_sensor)}}"
+
+  current_pollen_color: '{{ current_pollen | replace("very_high", "#F65E5F") | replace("high" , "#F99049") |replace("medium", "#FACF39") | replace("very_low", "#9CD84E") | replace("low", "#9CD84E") | replace("none", "#D0D5DD")}}'
+  current_weed_color: '{{ current_weed | replace("very_high", "#F65E5F") | replace("high" , "#F99049") | replace("medium", "#FACF39") | replace("very_low", "#9CD84E") | replace("low", "#9CD84E") | replace("none", "#D0D5DD")}}'
+  current_tree_color: '{{ current_tree | replace("very_high", "#F65E5F") | replace("high" , "#F99049") | replace("medium", "#FACF39") | replace("very_low", "#9CD84E") | replace("low", "#9CD84E") | replace("none", "#D0D5DD")}}'
+  current_grass_color: '{{ current_grass | replace("very_high", "#F65E5F") | replace("high" , "#F99049") | replace("medium", "#FACF39") | replace("very_low", "#9CD84E") | replace("low", "#9CD84E") | replace("none", "#D0D5DD")}}'
+
+  current_index: '{{ current_pollen | replace("very_high", 4) | replace("high" , 3) | replace("medium", 2) | replace("very_low", 1) | replace("low", 1) | replace("none", 0)}}'
+  current_weed_index: '{{ current_weed | replace("very_high", 4) | replace("high" , 3) | replace("medium", 2) | replace("very_low", 1) | replace("low", 1) | replace("none", 0)}}'
+  current_tree_index: '{{ current_tree | replace("very_high", 4) | replace("high" , 3) | replace("medium", 2) | replace("very_low", 1) | replace("low", 1) | replace("none", 0)}}'
+  current_grass_index: '{{ current_grass | replace("very_high", 4) | replace("high" , 3) | replace("medium", 2) | replace("very_low", 1) | replace("low", 1) | replace("none", 0)}}'
+
+  grass_sprite: >-
+    {%-  macro icon_grass_0(x,y) %}
+    {"db": [{{x}}, {{y}}, 5, 6, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9240076, 0, 2402836, 0, 0, 2402836, 0, 9240076, 0, 2402836, 2402836, 9240076, 2402836, 2402836]]}
+    {%- endmacro %}
+
+    {%-  macro icon_grass_1(x,y) %}
+    {"db": [{{x}}, {{y}}, 5, 6, [0, 16050828, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9240076, 0, 2402836, 0, 0, 2402836, 0, 9240076, 0, 2402836, 2402836, 9240076, 2402836, 2402836]]}
+    {%- endmacro %}
+
+    {%-  macro icon_grass_2(x,y) %}
+    {"db": [{{x}}, {{y}}, 5, 6, [0, 0, 0, 16050828, 0, 0, 0, 0, 0, 0, 16050828, 0, 0, 0, 0, 0, 9240076, 0, 2402836, 0, 0, 2402836, 0, 9240076, 0, 2402836, 2402836, 9240076, 2402836, 2402836]]}
+    {%- endmacro %}
+
+    {%-  macro icon_grass_3(x,y) %}
+    {"db": [{{x}}, {{y}}, 5, 6, [0, 16050828, 0, 0, 0, 0, 0, 0, 16050828, 0, 16050828, 0, 0, 0, 0, 0, 9240076, 0, 2402836, 0, 0, 2402836, 0, 9240076, 0, 2402836, 2402836, 9240076, 2402836, 2402836]]}
+    {%- endmacro %}
+
+    {%-  macro icon_grass_4(x,y) %}
+    {"db": [{{x}}, {{y}}, 5, 6, [0, 16050828, 0, 0, 16050828, 0, 0, 0, 0, 0, 16050828, 0, 16050828, 0, 0, 0, 9240076, 0, 2402836, 0, 0, 2402836, 0, 9240076, 0, 2402836, 2402836, 9240076, 2402836, 2402836]]}
+    {%- endmacro %}
+
+    {%- set x = 23 %}
+    {%- set y = 0 %}
+    {%- if current_grass_index == 0 -%}
+    {{icon_grass_0(x,y)}},
+    {%- elif current_grass_index == 1 -%}
+    {{icon_grass_1(x,y)}},
+    {%- elif current_grass_index == 2 -%}
+    {{icon_grass_2(x,y)}},
+    {%- elif current_grass_index == 3 -%}
+    {{icon_grass_3(x,y)}},
+    {%- elif current_grass_index == 4 -%}
+    {{icon_grass_4(x,y)}},
+    {%- endif %}
+
+    {"dl": [23,6,27,6,"{{current_grass_color}}"]}
+
+  weed_sprite: >-
+    {%-  macro icon_weed_0(x,y) %}
+      {"db": [{{x}}, {{y}}, 5, 4, [0, 0, 9240076, 0, 0, 0, 0, 9240076, 0, 0, 0, 2402836, 8673828, 2402836, 0, 0, 0, 8673828, 0, 0]]}
+    {%- endmacro %}
+
+    {%-  macro icon_weed_1(x,y) %}
+      {"db": [{{x}}, {{y}}, 5, 4, [0, 0, 9240076, 0, 0, 0, 0, 9240076, 0, 16050828, 0, 2402836, 8673828, 2402836, 0, 0, 0, 8673828, 0, 0]]}
+    {%- endmacro %}
+
+    {%-  macro icon_weed_2(x,y) %}
+      {"db": [{{x}}, {{y}}, 5, 4, [16050828, 0, 9240076, 0, 0, 0, 0, 9240076, 0, 16050828, 0, 2402836, 8673828, 2402836, 0, 0, 0, 8673828, 0, 0]]}
+    {%- endmacro %}
+
+    {%-  macro icon_weed_3(x,y) %}
+      {"db": [{{x}}, {{y}}, 5, 4, [0, 0, 9240076, 0, 16050828, 16050828, 0, 9240076, 0, 0, 0, 2402836, 8673828, 2402836, 0, 16050828, 0, 8673828, 0, 0]]}
+    {%- endmacro %}
+
+    {%-  macro icon_weed_4(x,y) %}
+      {"db": [{{x}}, {{y}}, 5, 4, [0, 0, 9240076, 0, 16050828, 16050828, 0, 9240076, 16050828, 0, 0, 2402836, 8673828, 2402836, 0, 16050828, 0, 8673828, 0, 0]]}
+    {%- endmacro %}
+
+    {%- set x = 17 %}
+    {%- set y = 2 %}
+    {%- if current_weed_index == 0 -%}
+    {{icon_weed_0(x,y)}},
+    {%- elif current_weed_index == 1 -%}
+    {{icon_weed_1(x,y)}},
+    {%- elif current_weed_index == 2 -%}
+    {{icon_weed_2(x,y)}},
+    {%- elif current_weed_index == 3 -%}
+    {{icon_weed_3(x,y)}},
+    {%- elif current_weed_index == 4 -%}
+    {{icon_weed_4(x,y)}},
+    {%- endif %}
+
+    {"dl": [17,6,21,6,"{{current_weed_color}}"]}
+
+  tree_sprite: >-
+    {%-  macro icon_tree_0(x,y) %}
+    {"db": [{{x}}, {{y}}, 6, 6, [0, 1946145, 2402836, 2402836, 0, 0, 2402836, 2402836, 2402836, 1946145, 2402836, 0, 2402836, 2402836, 2402836, 2402836, 2402836, 0, 0, 2402836, 1946145, 2402836, 0, 0, 0, 0, 8673828, 0, 0, 0, 0, 0, 8673828, 0, 0, 0]]}
+    {%- endmacro %}
+
+    {%-  macro icon_tree_1(x,y) %}
+    {"db": [{{x}}, {{y}}, 6, 6, [0, 1946145, 2402836, 2402836, 0, 0, 2402836, 16050828, 2402836, 1946145, 2402836, 0, 2402836, 2402836, 2402836, 2402836, 2402836, 0, 0, 2402836, 1946145, 2402836, 0, 0, 0, 0, 8673828, 0, 16050828, 0, 0, 0, 8673828, 0, 0, 0]]}
+    {%- endmacro %}
+
+    {%-  macro icon_tree_2(x,y) %}
+    {"db": [{{x}}, {{y}}, 6, 6, [0, 16050828, 2402836, 2402836, 0, 0, 2402836, 2402836, 2402836, 16050828, 2402836, 16050828, 2402836, 2402836, 2402836, 2402836, 2402836, 0, 0, 2402836, 1946145, 2402836, 0, 0, 0, 0, 8673828, 0, 0, 0, 16050828, 0, 8673828, 0, 0, 0]]}
+    {%- endmacro %}
+
+    {%-  macro icon_tree_3(x,y) %}
+    {"db": [{{x}}, {{y}}, 6, 6, [0, 16050828, 2402836, 2402836, 0, 0, 2402836, 2402836, 2402836, 16050828, 2402836, 16050828, 2402836, 2402836, 2402836, 2402836, 2402836, 0, 0, 2402836, 16050828, 2402836, 0, 0, 0, 0, 8673828, 0, 16050828, 0, 16050828, 0, 8673828, 0, 0, 0]]}
+    {%- endmacro %}
+
+    {%-  macro icon_tree_4(x,y) %}
+    {"db": [{{x}}, {{y}}, 6, 6, [0, 16050828, 2402836, 2402836, 0, 0, 2402836, 2402836, 2402836, 16050828, 2402836, 16050828, 2402836, 2402836, 2402836, 2402836, 2402836, 0, 0, 2402836, 16050828, 2402836, 0, 0, 0, 0, 8673828, 0, 16050828, 0, 16050828, 0, 8673828, 16050828, 0, 0]]}
+    {%- endmacro %}
+
+    {%- set x = 11 %}
+    {%- set y = 0 %}
+    {%- if current_tree_index == 0 -%}
+    {{icon_tree_0(x,y)}},
+    {%- elif current_tree_index == 1 -%}
+    {{icon_tree_1(x,y)}},
+    {%- elif current_tree_index == 2 -%}
+    {{icon_tree_2(x,y)}},
+    {%- elif current_tree_index == 3 -%}
+    {{icon_tree_3(x,y)}},
+    {%- elif current_tree_index == 4 -%}
+    {{icon_tree_4(x,y)}},
+    {%- endif %}
+
+    {"dl": [11,6,15,6,"{{current_tree_color}}"]}
+
+  flower_sprite: >-
+   {%-  macro icon_flower_0(x,y) %}
+    {"db": [{{x}}, {{y}}, 6, 6, [0, 0, 0, 16777215, 0, 0, 0, 0, 16777215, 16776960, 16777215, 0, 0, 0, 0, 16777215, 0, 0, 0, 0, 0, 0, 1946145, 0, 0, 0, 0, 0, 0, 1946145, 0, 0, 0, 0, 0, 1946145]]}
+    {%- endmacro %}
+
+    {%-  macro icon_flower_1(x,y) %}
+    {"db": [{{x}}, {{y}}, 6, 6, [0, 0, 0, 16777215, 0, 0, 0, 0, 16777215, 16776960, 16777215, 0, 0, 0, 0, 16777215, 0, 0, 0, 16050828, 0, 0, 1946145, 0, 0, 0, 0, 0, 0, 1946145, 0, 0, 0, 0, 0, 1946145]]}
+    {%- endmacro %}
+
+    {%-  macro icon_flower_2(x,y) %}
+    {"db": [{{x}}, {{y}}, 6, 6, [0, 0, 0, 16777215, 0, 0, 0, 0, 16777215, 16776960, 16777215, 0, 0, 16050828, 0, 16777215, 0, 0, 0, 0, 0, 0, 1946145, 0, 0, 0, 16050828, 0, 0, 1946145, 0, 0, 0, 0, 0, 1946145]]}
+    {%- endmacro %}
+
+    {%-  macro icon_flower_3(x,y) %}
+    {"db": [{{x}}, {{y}}, 6, 6, [0, 0, 0, 16777215, 0, 0, 16050828, 0, 16777215, 16776960, 16777215, 0, 0, 0, 0, 16777215, 0, 0, 0, 16050828, 0, 0, 1946145, 0, 0, 0, 0, 0, 0, 1946145, 0, 0, 16050828, 0, 0, 1946145]]}
+    {%- endmacro %}
+
+    {%-  macro icon_flower_4(x,y) %}
+    {"db": [{{x}}, {{y}}, 6, 6, [0, 0, 0, 16777215, 0, 0, 16050828, 0, 16777215, 16776960, 16777215, 0, 0, 0, 0, 16777215, 0, 16050828, 0, 16050828, 0, 0, 1946145, 0, 16050828, 0, 0, 0, 0, 1946145, 0, 0, 16050828, 0, 0, 1946145]]}
+    {%- endmacro %}
+
+    {%- set x = 3 %}
+    {%- set y = 0 %}
+    {%- if current_index == 0 -%}
+    {{icon_flower_0(x,y)}},
+    {%- elif current_index == 1 -%}
+    {{icon_flower_1(x,y)}},
+    {%- elif current_index == 2 -%}
+    {{icon_flower_2(x,y)}},
+    {%- elif current_index == 3 -%}
+    {{icon_flower_3(x,y)}},
+    {%- elif current_index == 4 -%}
+    {{icon_flower_4(x,y)}},
+    {%- endif %}
+    {"dl": [3,6,8,6,"{{current_pollen_color}}"]}
+
+  payload: >-
+    {"draw": [            
+      {{grass_sprite}},
+      {{weed_sprite}},
+      {{tree_sprite}}, 
+      {{flower_sprite}}
+      ]
+      }
+
+trigger:
+  - platform: time_pattern
+    minutes: /1
+condition: []
+action:
+  - repeat:
+      for_each: "{{ message_topics }}"
+      sequence:
+        - service: mqtt.publish
+          data:
+            qos: 0
+            retain: false
+            topic: "{{ repeat.item }}"
+            payload: >
+              {{payload}}
